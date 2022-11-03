@@ -5,11 +5,11 @@
   const FRAME_RATE = 60
   const PARTICLE_NUM = 2000
   const RADIUS = Math.PI * 2
-  const CANVASWIDTH = 500
+  const CANVASWIDTH = 800
   const CANVASHEIGHT = 150
   const CANVASID = 'canvas'
 
-  let texts = ['MY DEAR', 'LOOK UP AT THE', 'STARRY SKY', 'ARE YOU', 'LOOKING AT THE', 'SAME STAR', 'WITH ME ?', 'HAPPY', 'CHINESE', 'VALENTINE\'S', 'DAY', 'I MISS YOU']
+  let texts = ['My BUNNY', 'WELCOME TO', 'MY PROFILE', 'Today', 'MY DOMAIN IS', 'FOR YOU!', 'HAPPY BIRTHDAY!', 'I MISS YOU~', 'A SECRET PASSWORD', 'FOR YOU', '09f2406149ac5f92be', '5ab8e4a15ecdbd']
 
   let canvas,
     ctx,
