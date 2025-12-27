@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肺栓塞风险评估系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a5f7a;
+            --primary-light: #2d8bba;
+            --primary-dark: #0d3d4d;
+            --accent: #e85a4f;
+            --accent-light: #ff7b6b;
+            --bg-primary: #f8fafb;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #1a2a3a;
+            --text-secondary: #5a6a7a;
+            --text-muted: #8a9aaa;
+            --border: #e0e8f0;
+            --shadow: rgba(26, 95, 122, 0.08);
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gradient-primary: linear-gradient(135deg, #1a5f7a 0%, #2d8bba 100%);
+            --gradient-accent: linear-gradient(135deg, #e85a4f 0%, #ff7b6b 100%);
+        }
+
+        .dark {
+            --primary: #4db8d8;
+            --primary-light: #6dd5f5;
+            --primary-dark: #2d8bba;
+            --accent: #ff7b6b;
+            --accent-light: #ff9a8b;
+            --bg-primary: #0d1520;
+            --bg-secondary: #1a2535;
+            --bg-card: #243040;
+            --text-primary: #e8f0f8;
+            --text-secondary: #a8b8c8;
+            --text-muted: #6a7a8a;
+            --border: #3a4a5a;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --gradient-primary: linear-gradient(135deg, #1a5f7a 0%, #4db8d8 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--gradient-primary);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .logo span {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-icon {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-icon:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .card-header {
+            background: var(--bg-secondary);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header i {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Elements */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        label i {
+            color: var(--primary);
+            font-size: 0.85rem;
+        }
+
+        input, select, textarea {
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(26, 95, 122, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Checkbox Group */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--primary-light);
+            background: rgba(26, 95, 122, 0.05);
+        }
+
+        .checkbox-item.checked {
+            border-color: var(--primary);
+            background: rgba(26, 95, 122, 0.1);
+        }
+
+        .checkbox-item input {
+            display: none;
+        }
+
+        .checkbox-custom {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .checkbox-item.checked .checkbox-custom {
+            background: var(--gradient-primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox-custom i {
+            color: white;
+            font-size: 0.75rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s;
+        }
+
+        .checkbox-item.checked .checkbox-custom i {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .checkbox-label {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        /* Vital Signs */
+        .vital-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .vital-item {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .vital-item label {
+            display: block;
+            margin-bottom: 0.5rem;
+            justify-content: center;
+        }
+
+        .vital-item input {
+            width: 100%;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .vital-unit {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* API Settings */
+        .api-settings {
+            display: grid;
+            grid-template-columns: 1fr 2fr 120px;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        @media (max-width: 768px) {
+            .api-settings {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .input-with-icon input {
+            padding-left: 2.75rem;
+            width: 100%;
+        }
+
+        /* Poe API Info Box */
+        .api-info {
+            background: rgba(26, 95, 122, 0.08);
+            border: 1px solid rgba(26, 95, 122, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .api-info h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-info ul {
+            padding-left: 1.5rem;
+            margin: 0.75rem 0;
+        }
+
+        .api-info li {
+            margin: 0.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        .api-info strong {
+            color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 95, 122, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 95, 122, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-accent {
+            background: var(--gradient-accent);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        /* Results */
+        .result-container {
+            display: none;
+        }
+
+        .result-container.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Analysis Content */
+        .analysis-content {
+            padding: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .analysis-content h1, .analysis-content h2, .analysis-content h3 {
+            color: var(--primary);
+            margin: 1.5rem 0 1rem;
+        }
+
+        .analysis-content h1:first-child,
+        .analysis-content h2:first-child,
+        .analysis-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .analysis-content ul, .analysis-content ol {
+            padding-left: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .analysis-content li {
+            margin: 0.5rem 0;
+        }
+
+        .analysis-content p {
+            margin: 1rem 0;
+        }
+
+        .analysis-content strong {
+            color: var(--primary);
+        }
+
+        .analysis-content code {
+            background: var(--bg-secondary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .analysis-content blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-content {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-subtext {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-header h3 i {
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .disclaimer i {
+            color: #b38600;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .disclaimer p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vital-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .api-settings {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Streaming cursor */
+        .streaming-cursor::after {
+            content: '▋';
+            animation: blink 1s step-end infinite;
+            color: var(--primary);
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-lungs"></i>
+                <div>
+                    <h1>肺栓塞风险评估系统</h1>
+                    <span>Pulmonary Embolism Risk Assessment</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" onclick="openApiSettings()" title="API 设置">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="btn-icon" onclick="openHelp()" title="使用帮助">
+                    <i class="fas fa-question"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- API Configuration -->
+        <div class="card" id="apiCard">
+            <div class="card-header">
+                <i class="fas fa-key"></i>
+                <h2>API 配置</h2>
+            </div>
+            <div class="card-body">
+                <div class="api-info">
+                    <h4><i class="fas fa-info-circle"></i> Poe API 使用说明</h4>
+                    <p><strong>Poe API 说明：</strong></p>
+                    <ul>
+                        <li>使用 Poe 官方 OpenAI‑compatible 接口</li>
+                        <li>API Key 请在 <strong>https://poe.com/api_key</strong> 生成</li>
+                        <li><strong>模型名称必须与 Poe 网页地址栏中的 Bot 名称完全一致（区分大小写）</strong></li>
+                        <li>示例：Claude-3.5-Sonnet / GPT-4o / Gemini-2.5-Pro</li>
+                    </ul>
+                </div>
+
+                <div class="api-settings">
+                    <div class="form-group">
+                        <label><i class="fas fa-robot"></i> 模型提供商</label>
+                        <select id="apiProvider" onchange="updateApiEndpoint()">
+                            <option value="openai">OpenAI</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="anthropic">Anthropic Claude</option>
+                            <option value="poe" selected>Poe API</option>
+                            <option value="custom">自定义</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> API Endpoint</label>
+                        <input type="text" id="apiEndpoint" placeholder="https://api.poe.com/v1/chat/completions">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-key"></i> API Key</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="apiKey" placeholder="poe_xxxxx">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label><i class="fas fa-microchip"></i> 模型名称（Poe Bot Name）</label>
+                    <input type="text" id="modelName" placeholder="Claude-3.5-Sonnet">
+                    <small style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">必须与Poe网页地址栏中的Bot名称完全一致</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user"></i>
+                <h2>患者基本信息</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-birthday-cake"></i> 年龄</label>
+                        <input type="number" id="age" placeholder="请输入年龄" min="0" max="150">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-venus-mars"></i> 性别</label>
+                        <select id="gender">
+                            <option value="">请选择</option>
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-weight"></i> 体重 (kg)</label>
+                        <input type="number" id="weight" placeholder="体重" min="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-ruler-vertical"></i> 身高 (cm)</label>
+                        <input type="number" id="height" placeholder="身高" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chief Complaint -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-comment-medical"></i>
+                <h2>主诉症状</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group full-width">
+                    <label><i class="fas fa-notes-medical"></i> 主诉描述</label>
+                    <textarea id="chiefComplaint" placeholder="请详细描述患者的主要症状，如：突发呼吸困难、胸痛、咯血等..."></textarea>
+                </div>
+                <div style="margin-top: 1.25rem;">
+                    <label style="margin-bottom: 0.75rem; display: block;"><i class="fas fa-clipboard-list"></i> 常见症状（可多选）</label>
+                    <div class="checkbox-grid" id="symptomsGrid">
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="symptoms" value="dyspnea">
+                            <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                            <span class="checkbox-label">呼吸困难</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="symptoms" value="chest_pain">
+                            <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                            <span class="checkbox-label">胸痛</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="symptoms" value="hemoptysis">
+                            <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                            <span class="checkbox-label">咯血</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="symptoms" value="syncope">
+                            <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                            <span class="checkbox-label">晕厥</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="symptoms" value="palpitation">
+                            <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                            <span class="checkbox-label">心悸</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="symptoms" value="cough">
+                            <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                            <span class="checkbox-label">咳嗽</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="symptoms" value="leg_pain">
+                            <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                            <span class="checkbox-label">下肢疼痛</span>
+                        </label>
+                        <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="symptoms" value="leg_swelling">
+                            <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                            <span class="checkbox-label">下肢肿胀</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vital Signs -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-heartbeat"></i>
+                <h2>生命体征</h2>
+            </div>
+            <div class="card-body">
+                <div class="vital-grid">
+                    <div class="vital-item">
+                        <label><i class="fas fa-heart"></i> 心率</label>
+                        <input type="number" id="heartRate" placeholder="--" min="0" max="300">
+                        <div class="vital-unit">次/分</div>
+                    </div>
+                    <div class="vital-item">
+                        <label><i class="fas fa-wind"></i> 呼吸频率</label>
+                        <input type="number" id="respRate" placeholder="--" min="0" max="60">
+                        <div class="vital-unit">次/分</div>
+                    </div>
+                    <div class="vital-item">
+                        <label><i class="fas fa-tachometer-alt"></i> 收缩压</label>
+                        <input type="number" id="systolicBP" placeholder="--" min="0" max="300">
+                        <div class="vital-unit">mmHg</div>
+                    </div>
+                    <div class="vital-item">
+                        <label><i class="fas fa-tachometer-alt"></i> 舒张压</label>
+                        <input type="number" id="diastolicBP" placeholder="--" min="0" max="200">
+                        <div class="vital-unit">mmHg</div>
+                    </div>
+                    <div class="vital-item">
+                        <label><i class="fas fa-lungs"></i> 血氧饱和度</label>
+                        <input type="number" id="spo2" placeholder="--" min="0" max="100">
+                        <div class="vital-unit">%</div>
+                    </div>
+                    <div class="vital-item">
+                        <label><i class="fas fa-thermometer-half"></i> 体温</label>
+                        <input type="number" id="temperature" placeholder="--" min="30" max="45" step="0.1">
+                        <div class="vital-unit">°C</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Physical Examination -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-stethoscope"></i>
+                <h2>体格检查</h2>
+            </div>
+            <div class="card-body">
+                <label style="margin-bottom: 0.75rem; display: block;"><i class="fas fa-search"></i> 查体发现（可多选）</label>
+                <div class="checkbox-grid" id="peGrid">
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="leg_asymmetry">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">双下肢不对称性肿胀</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="calf_tenderness">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">小腿深压痛</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="homans_sign">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">Homans征阳性</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="tachycardia">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">心动过速</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="tachypnea">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">呼吸急促</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="hypotension">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">低血压</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="jvd">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">颈静脉怒张</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="p2_accentuated">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">P2亢进</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="cyanosis">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">发绀</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="pe" value="pleural_rub">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">胸膜摩擦音</span>
+                    </label>
+                </div>
+                <div class="form-group" style="margin-top: 1.25rem;">
+                    <label><i class="fas fa-edit"></i> 其他查体发现</label>
+                    <textarea id="otherPE" placeholder="请描述其他体格检查发现..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Factors -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h2>危险因素</h2>
+            </div>
+            <div class="card-body">
+                <div class="checkbox-grid" id="riskGrid">
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="recent_surgery">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">近期手术(4周内)</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="immobilization">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">长期卧床/制动</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="malignancy">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">恶性肿瘤</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="previous_vte">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">既往VTE病史</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="trauma">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">近期创伤</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="long_travel">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">长途旅行(>4小时)</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="obesity">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">肥胖(BMI>30)</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="pregnancy">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">妊娠/产后</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="oral_contraceptive">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">口服避孕药/HRT</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="heart_failure">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">心力衰竭</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="thrombophilia">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">血栓性疾病史</span>
+                    </label>
+                    <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                        <input type="checkbox" name="risk" value="central_catheter">
+                        <span class="checkbox-custom"><i class="fas fa-check"></i></span>
+                        <span class="checkbox-label">中心静脉置管</span>
+                    </label>
+                </div>
+                <div class="form-group" style="margin-top: 1.25rem;">
+                    <label><i class="fas fa-history"></i> 病史补充</label>
+                    <textarea id="medicalHistory" placeholder="请补充其他相关病史，如：既往疾病、用药史、家族史等..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="performAssessment()">
+                <i class="fas fa-search-plus"></i>
+                开始评估
+            </button>
+            <button class="btn btn-outline" onclick="resetForm()">
+                <i class="fas fa-redo"></i>
+                重置表单
+            </button>
+        </div>
+
+        <!-- Results -->
+        <div class="result-container" id="resultContainer">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <h2>详细分析报告</h2>
+                </div>
+                <div class="analysis-content" id="analysisContent">
+                    <p>分析报告将在此显示...</p>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                <i class="fas fa-exclamation-circle"></i>
+                <p><strong>免责声明：</strong>本评估系统仅供医学参考，不能替代专业医生的临床诊断。评估结果基于AI分析，可能存在误差。如有紧急情况，请立即就医。所有临床决策应由具有资质的医疗专业人员做出。</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>肺栓塞风险评估系统 © 2025 | 仅供医学研究参考使用</p>
+        <p>Powered by AI | <a href="https://github.com" target="_blank">GitHub</a></p>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">正在进行风险评估...</div>
+            <div class="loading-subtext" id="loadingSubtext">AI正在分析患者数据</div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle"></i> 使用帮助</h3>
+                <button class="modal-close" onclick="closeHelp()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4 style="margin-bottom: 1rem; color: var(--primary);">如何使用本系统</h4>
+                <ol style="padding-left: 1.25rem; line-height: 2;">
+                    <li><strong>配置API：</strong>首先选择模型提供商并输入您的API Key</li>
+                    <li><strong>填写患者信息：</strong>录入患者的基本信息、主诉症状</li>
+                    <li><strong>记录生命体征：</strong>输入测量到的生命体征数据</li>
+                    <li><strong>体格检查：</strong>勾选相关的阳性体征</li>
+                    <li><strong>评估危险因素：</strong>选择患者存在的危险因素</li>
+                    <li><strong>开始评估：</strong>点击按钮获取AI分析结果</li>
+                </ol>
+                <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 10px;">
+                    <h4 style="margin-bottom: 0.5rem; color: var(--primary);">支持的API提供商</h4>
+                    <ul style="padding-left: 1.25rem; line-height: 1.8;">
+                        <li>OpenAI (GPT-4o, GPT-4-turbo等)</li>
+                        <li>DeepSeek</li>
+                        <li>Anthropic Claude</li>
+                        <li><strong>Poe API</strong> (Claude-3.5-Sonnet, GPT-4o等)</li>
+                        <li>其他兼容OpenAI格式的API</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeHelp()">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Settings Modal -->
+    <div class="modal-overlay" id="apiModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> API 设置</h3>
+                <button class="modal-close" onclick="closeApiSettings()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>启用网络搜索增强</label>
+                    <select id="enableWebSearch">
+                        <option value="true">是 - 使用最新医学指南</option>
+                        <option value="false">否 - 仅使用模型知识</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>响应语言</label>
+                    <select id="responseLanguage">
+                        <option value="zh">中文</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>详细程度</label>
+                    <select id="detailLevel">
+                        <option value="detailed">详细 - 包含完整分析</option>
+                        <option value="concise">简洁 - 重点结论</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeApiSettings()">取消</button>
+                <button class="btn btn-primary" onclick="saveApiSettings()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Initialize API endpoint
+        function updateApiEndpoint() {
+            const provider = document.getElementById('apiProvider').value;
+            const endpointInput = document.getElementById('apiEndpoint');
+            const modelInput = document.getElementById('modelName');
+
+            const endpoints = {
+                openai: 'https://api.openai.com/v1/chat/completions',
+                deepseek: 'https://api.deepseek.com/v1/chat/completions',
+                anthropic: 'https://api.anthropic.com/v1/messages',
+                poe: 'https://api.poe.com/v1/chat/completions',
+                custom: ''
+            };
+
+            const models = {
+                openai: 'gpt-4o',
+                deepseek: 'deepseek-chat',
+                anthropic: 'claude-3-sonnet-20240229',
+                poe: 'Claude-3.5-Sonnet',
+                custom: ''
+            };
+
+            endpointInput.value = endpoints[provider];
+            modelInput.value = models[provider];
+        }
+
+        // Initialize on load
+        updateApiEndpoint();
+
+        // Checkbox toggle
+        function toggleCheckbox(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            element.classList.toggle('checked', checkbox.checked);
+        }
+
+        // Modal functions
+        function openHelp() {
+            document.getElementById('helpModal').classList.add('visible');
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').classList.remove('visible');
+        }
+
+        function openApiSettings() {
+            document.getElementById('apiModal').classList.add('visible');
+        }
+
+        function closeApiSettings() {
+            document.getElementById('apiModal').classList.remove('visible');
+        }
+
+        function saveApiSettings() {
+            closeApiSettings();
+        }
+
+        // Reset form
+        function resetForm() {
+            document.querySelectorAll('input[type="text"], input[type="number"], input[type="password"], textarea').forEach(el => {
+                el.value = '';
+            });
+            document.querySelectorAll('select').forEach(el => {
+                el.selectedIndex = 0;
+            });
+            document.querySelectorAll('.checkbox-item').forEach(el => {
+                el.classList.remove('checked');
+                el.querySelector('input').checked = false;
+            });
+            document.getElementById('resultContainer').classList.remove('visible');
+            updateApiEndpoint();
+        }
+
+        // Collect form data
+        function collectFormData() {
+            const getCheckedValues = (name) => {
+                return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+                    .map(cb => cb.value);
+            };
+
+            const symptomLabels = {
+                dyspnea: '呼吸困难',
+                chest_pain: '胸痛',
+                hemoptysis: '咯血',
+                syncope: '晕厥',
+                palpitation: '心悸',
+                cough: '咳嗽',
+                leg_pain: '下肢疼痛',
+                leg_swelling: '下肢肿胀'
+            };
+
+            const peLabels = {
+                leg_asymmetry: '双下肢不对称性肿胀',
+                calf_tenderness: '小腿深压痛',
+                homans_sign: 'Homans征阳性',
+                tachycardia: '心动过速',
+                tachypnea: '呼吸急促',
+                hypotension: '低血压',
+                jvd: '颈静脉怒张',
+                p2_accentuated: 'P2亢进',
+                cyanosis: '发绀',
+                pleural_rub: '胸膜摩擦音'
+            };
+
+            const riskLabels = {
+                recent_surgery: '近期手术(4周内)',
+                immobilization: '长期卧床/制动',
+                malignancy: '恶性肿瘤',
+                previous_vte: '既往VTE病史',
+                trauma: '近期创伤',
+                long_travel: '长途旅行(>4小时)',
+                obesity: '肥胖(BMI>30)',
+                pregnancy: '妊娠/产后',
+                oral_contraceptive: '口服避孕药/HRT',
+                heart_failure: '心力衰竭',
+                thrombophilia: '血栓性疾病史',
+                central_catheter: '中心静脉置管'
+            };
+
+            return {
+                patient: {
+                    age: document.getElementById('age').value,
+                    gender: document.getElementById('gender').value === 'male' ? '男' :
+                            document.getElementById('gender').value === 'female' ? '女' : '未指定',
+                    weight: document.getElementById('weight').value,
+                    height: document.getElementById('height').value
+                },
+                chiefComplaint: document.getElementById('chiefComplaint').value,
+                symptoms: getCheckedValues('symptoms').map(v => symptomLabels[v]),
+                vitalSigns: {
+                    heartRate: document.getElementById('heartRate').value,
+                    respRate: document.getElementById('respRate').value,
+                    systolicBP: document.getElementById('systolicBP').value,
+                    diastolicBP: document.getElementById('diastolicBP').value,
+                    spo2: document.getElementById('spo2').value,
+                    temperature: document.getElementById('temperature').value
+                },
+                physicalExam: getCheckedValues('pe').map(v => peLabels[v]),
+                otherPE: document.getElementById('otherPE').value,
+                riskFactors: getCheckedValues('risk').map(v => riskLabels[v]),
+                medicalHistory: document.getElementById('medicalHistory').value
+            };
+        }
+
+        // Build prompt
+        function buildPrompt(data) {
+            const lang = document.getElementById('responseLanguage').value;
+            const detail = document.getElementById('detailLevel').value;
+            const webSearch = document.getElementById('enableWebSearch').value === 'true';
+
+            let prompt = `你是一位经验丰富的呼吸内科和急诊医学专家。请根据以下患者信息，评估其肺栓塞(PE)的可能性。
+
+## 患者信息
+- 年龄: ${data.patient.age || '未提供'}岁
+- 性别: ${data.patient.gender}
+- 体重: ${data.patient.weight || '未提供'}kg
+- 身高: ${data.patient.height || '未提供'}cm
+
+## 主诉
+${data.chiefComplaint || '无详细描述'}
+
+## 症状
+${data.symptoms.length > 0 ? data.symptoms.join('、') : '未选择特定症状'}
+
+## 生命体征
+- 心率: ${data.vitalSigns.heartRate || '未测'}次/分
+- 呼吸频率: ${data.vitalSigns.respRate || '未测'}次/分
+- 血压: ${data.vitalSigns.systolicBP || '--'}/${data.vitalSigns.diastolicBP || '--'} mmHg
+- 血氧饱和度: ${data.vitalSigns.spo2 || '未测'}%
+- 体温: ${data.vitalSigns.temperature || '未测'}°C
+
+## 体格检查
+${data.physicalExam.length > 0 ? data.physicalExam.join('、') : '未见明显异常'}
+${data.otherPE ? '\n其他发现: ' + data.otherPE : ''}
+
+## 危险因素
+${data.riskFactors.length > 0 ? data.riskFactors.join('、') : '未发现明确危险因素'}
+
+## 病史补充
+${data.medicalHistory || '无特殊补充'}
+
+---
+
+请完成以下评估任务：
+
+1. **风险概率评估**: 给出一个0-100%的肺栓塞可能性概率估计值
+
+2. **Wells评分计算**: 根据提供的信息计算Wells评分（如信息不完整请说明）
+
+3. **Geneva评分计算**: 根据提供的信息计算修订版Geneva评分（如信息不完整请说明）
+
+4. **临床分析**:
+   - 列出支持PE诊断的阳性发现
+   - 列出不支持PE诊断的阴性发现
+   - 分析主要危险因素
+
+5. **鉴别诊断**: 列出需要考虑的其他可能诊断
+
+6. **建议**:
+   - 推荐进一步检查（如D-二聚体、CTPA等）
+   - 处理建议
+   - 紧急程度评估
+
+${webSearch ? '\n请结合最新的肺栓塞诊疗指南（如ESC 2019、ACCP等）进行分析。' : ''}
+
+请用${lang === 'zh' ? '中文' : '英文'}回答，${detail === 'detailed' ? '提供详细完整的分析' : '重点突出结论，简洁明了'}。`;
+
+            return prompt;
+        }
+
+        // Simplified API call for Poe (no streaming)
+        async function callPoeAPI(endpoint, apiKey, model, prompt) {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: '你是一位专业的医学AI助手，专注于肺栓塞的临床诊断评估。请基于循证医学原则，结合最新诊疗指南进行分析。'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.3
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API请求失败: ${response.status} - ${error}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        // Main assessment function
+        async function performAssessment() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const endpoint = document.getElementById('apiEndpoint').value.trim();
+            const model = document.getElementById('modelName').value.trim();
+            const provider = document.getElementById('apiProvider').value;
+
+            if (!apiKey) {
+                showCustomAlert('请先配置API Key');
+                return;
+            }
+
+            if (!endpoint) {
+                showCustomAlert('请先配置API Endpoint');
+                return;
+            }
+
+            if (!model) {
+                showCustomAlert('请先配置模型名称');
+                return;
+            }
+
+            // Show loading
+            const loading = document.getElementById('loadingOverlay');
+            const loadingSubtext = document.getElementById('loadingSubtext');
+            loading.classList.add('visible');
+
+            // Show results container
+            const resultContainer = document.getElementById('resultContainer');
+            const analysisContent = document.getElementById('analysisContent');
+            resultContainer.classList.add('visible');
+            analysisContent.innerHTML = '<p>正在分析...</p>';
+
+            // Collect data and build prompt
+            const formData = collectFormData();
+            const prompt = buildPrompt(formData);
+
+            try {
+                loadingSubtext.textContent = '正在连接AI服务...';
+
+                let fullResponse;
+                if (provider === 'poe') {
+                    // Poe API 使用简单调用（不支持流式）
+                    fullResponse = await callPoeAPI(endpoint, apiKey, model, prompt);
+                } else {
+                    // 其他API使用流式调用（保持原逻辑）
+                    fullResponse = await callOpenAIFormat(endpoint, apiKey, model, prompt, (text) => {
+                        loading.classList.remove('visible');
+                        analysisContent.innerHTML = marked.parse(text);
+                        analysisContent.classList.add('streaming-cursor');
+                        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                    analysisContent.classList.remove('streaming-cursor');
+                }
+
+                // 对于Poe API，直接显示完整结果
+                loading.classList.remove('visible');
+                analysisContent.innerHTML = marked.parse(fullResponse);
+
+                // Scroll to results
+                resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (error) {
+                loading.classList.remove('visible');
+                analysisContent.innerHTML = `
+                    <div style="color: var(--danger); padding: 1rem; background: rgba(220, 53, 69, 0.1); border-radius: 10px;">
+                        <h3><i class="fas fa-exclamation-triangle"></i> 评估失败</h3>
+                        <p style="margin-top: 0.5rem;">${error.message}</p>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem;">请检查：</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li>API Key 是否正确</li>
+                            <li>API Endpoint 是否可访问</li>
+                            <li>模型名称是否正确（Poe需完全匹配Bot名称）</li>
+                            <li>网络连接是否正常</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        // Original OpenAI format call (保持原函数)
+        async function callOpenAIFormat(endpoint, apiKey, model, prompt, onChunk) {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: '你是一位专业的医学AI助手，专注于肺栓塞的临床诊断评估。请基于循证医学原则，结合最新诊疗指南进行分析。'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    stream: true,
+                    temperature: 0.3
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API请求失败: ${response.status} - ${error}`);
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                        try {
+                            const json = JSON.parse(line.slice(6));
+                            const content = json.choices?.[0]?.delta?.content;
+                            if (content) {
+                                fullText += content;
+                                onChunk(fullText);
+                            }
+                        } catch (e) {
+                            // Skip invalid JSON
+                        }
+                    }
+                }
+            }
+
+            return fullText;
+        }
+
+        // Custom alert function (替代 alert())
+        function showCustomAlert(message) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay visible';
+            modal.innerHTML = `
+                <div class="modal" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-info-circle"></i> 提示</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>${message}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">确定</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('visible');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
